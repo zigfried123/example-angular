@@ -1,0 +1,40 @@
+<div *ngIf="data.step == CartStep.PaymentType">
+    <div class="panel panel-default">
+
+        <h4 style="padding-left: 1em;">Товары: {{data.cart.articlesAmount|number:'1.2-2'}} &#x20bd;</h4>
+        <h4 *ngIf="data.cart.obtainMethod == CartObtainMethod.Delivery" style="padding-left: 1em;">Доставка: {{data.cart.deliveryAmount|number:'1.2-2'}} &#x20bd;</h4>
+        <h3 style="padding-left: 0.5em;">Общая стоимость заказа: {{data.cart.amount|number:'1.2-2'}} &#x20bd;</h3>
+
+        <div class="panel-heading">Способ оплаты</div>
+        <div class="panel-body">
+            <div class="radio">
+                <label>
+                    <input type="radio" name="paymentType" value="{{CartPaymentType.Cash}}"
+                           (click)="data.setPaymentType(CartPaymentType.Cash)"
+                           [checked]="data.cart.paymentType == CartPaymentType.Cash">
+                    Наличные
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="paymentType" value="{{CartPaymentType.Cashless}}"
+                           (click)="data.setPaymentType(CartPaymentType.Cashless)"
+                           [checked]="data.cart.paymentType == CartPaymentType.Cashless">
+                    <!--
+                    Электронная оплата (Банковские карты, электронные деньги)
+                    -->
+                    Безналичная
+                </label>
+            </div>
+            <div>Комментарий</div>
+            <div class="form-inline">
+                <input type="text" name="cart-comment" value="{{data.cart.comment}}" style="width: 500px;" (change)="data.setComment($event.target.value);">
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-success" type="button" (click)="data.order()">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        Оформить заказ
+    </button>
+</div>

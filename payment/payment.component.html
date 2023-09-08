@@ -1,0 +1,48 @@
+<h2 class="m-b-lg">Зачисления</h2>
+
+<div class="row m-b-sm">
+    <div class="col-lg-12 text-right">
+        <rv-csv-export 
+            filename="payments"
+            [request]="paymentService.getAll()"
+            [headers]="['№', 'Дата платежа', 'Услуга', 'Цена', 'ФИО клиента', 'ID клиента', 'Тип платежа', 'Автор', 'Основание']"
+            [fields]="[{key:'id'},{key:'created_at',modifier:'date'},{key:'service.name'},{key:'service.price'},{key:['user.surname','user.name','user.patronymic']},{key:'user.id'},{key:'type.name'},{key:'createdBy.name'},{key:'comment'}]">
+        </rv-csv-export>
+    </div>
+</div>
+
+<p-dataTable [value]="serviceUsers" rows="{{localGlobals.ROWS_PER_PAGE}}" [responsive]="true" [emptyMessage]="localGlobals.NO_DATA_TEXT">
+    
+    <p-column field="payment.id" header="№" [sortable]="false"></p-column>
+    
+    <p-column header="Дата платежа" [sortable]="false">
+        <ng-template let-col let-su="rowData" pTemplate="body">
+            <span>{{su.payment?.created_at * 1000 | date:'medium'}}</span>
+        </ng-template>
+    </p-column>
+
+    <p-column field="payment.service.name" header="Услуга" [sortable]="false"></p-column>
+
+    <p-column field="payment.amount" header="Сумма" [sortable]="false"></p-column>
+
+    <!--<p-column field="payment.user.name" header="Пользователь" [sortable]="false"></p-column>-->
+
+    <p-column header="Пользователь" [sortable]="false">
+        <ng-template let-col let-su="rowData" pTemplate="body">
+            <a class="link" (click)="onClientLinkClick(su.payment.user.id)">{{su.payment?.user.surname}} {{su.payment?.user.name}} {{su.payment?.user.patronymic}}</a>
+        </ng-template>
+    </p-column>
+
+    <p-column field="payment.type.name" header="Тип платежа" [sortable]="false"></p-column>
+
+    <p-column header="Автор" [sortable]="false">
+        <ng-template let-col let-su="rowData" pTemplate="body">
+            <span>{{su.payment?.created_by == su.payment?.user.id ? 'клиент' : 'сотрудник'}}</span>
+        </ng-template>
+    </p-column>
+
+    <p-column field="payment.comment" header="Основание" [sortable]="false"></p-column>
+
+</p-dataTable>
+
+<p-paginator rows="{{localGlobals.ROWS_PER_PAGE}}" totalRecords="{{totalRecords}}" first="{{firstRowIndex}}" (onPageChange)="paginate($event)"></p-paginator>

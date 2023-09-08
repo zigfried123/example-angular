@@ -1,0 +1,92 @@
+<h2 class="m-b-lg">Валюты</h2>
+
+<div class="row m-b-sm">
+    <div class="col-lg-12 text-right">
+        <rv-csv-export 
+            filename="currencies"
+            [request]="currencyService.getByPage(1)"
+            [headers]="['Краткое название', 'Полное название', 'Статус']"
+            [fields]="[{key:'short_name'},{key:'full_name'},{key:'is_active',modifier:'select',values:['Не активен','Активен']}]">
+        </rv-csv-export>
+        <button [dCheckAccess]="['createCurrency']" class="btn btn-primary" type="button" icon="fa-plus" (click)="showDialogToAdd()">Добавить</button>
+    </div>
+</div>
+
+<p-dataTable [value]="currencies" selectionMode="single" [(selection)]="selectedCurrency" (onRowSelect)="onRowSelect($event)" rows="{{localGlobals.ROWS_PER_PAGE}}" [responsive]="true">
+    <p-column field="short_name" header="Краткое название" [sortable]="false"></p-column>
+    <p-column field="full_name" header="Полное название" [sortable]="false"></p-column>
+
+    <p-column header="Статус" styleClass="col-button">
+        <ng-template let-currency="rowData" pTemplate="body">
+            {{currency.is_active ? 'Активен' : 'Не активен'}}
+        </ng-template>
+    </p-column>
+
+</p-dataTable>
+
+<p-paginator rows="{{localGlobals.ROWS_PER_PAGE}}" totalRecords="{{totalRecords}}" first="{{firstRowIndex}}" (onPageChange)="paginate($event)"></p-paginator>
+
+<p-dialog class="grid-dialog" header="Валюта" [(visible)]="displayDialog" [responsive]="true" showEffect="fade">
+
+    <form #currencyForm="ngForm">
+
+      <div class="ui-grid ui-grid-responsive ui-fluid full-width-inputs" *ngIf="currency">
+
+          <div [dCheckAccess]="['Currency_short_name']" class="ui-grid-row m-b-xs" [class.has-error]="!shortName.valid && shortName.dirty">
+              <div class="ui-grid-col-4"><label for="short_name">Краткое название</label></div>
+              <div class="ui-grid-col-8">
+                <input 
+                  pInputText 
+                  id="short_name" 
+                  name="short_name"
+                  [(ngModel)]="currency.short_name" 
+                  placeholder="Краткое название"
+                  class="form-control"
+                  #shortName="ngModel"
+                  required/>
+                  <span [hidden]="shortName.valid || shortName.pristine" class="help-block m-b-none text-left">
+                      Поле "Краткое название" является обязательным
+                  </span>
+              </div>
+          </div>
+
+          <div [dCheckAccess]="['Currency_full_name']" class="ui-grid-row m-b-xs" [class.has-error]="!fullName.valid && fullName.dirty">
+              <div class="ui-grid-col-4"><label for="full_name">Полное название</label></div>
+              <div class="ui-grid-col-8">
+                <input 
+                  pInputText 
+                  id="full_name" 
+                  name="full_name"
+                  [(ngModel)]="currency.full_name" 
+                  placeholder="Полное название"
+                  class="form-control"
+                  #fullName="ngModel"
+                  required/>
+                  <span [hidden]="fullName.valid || fullName.pristine" class="help-block m-b-none text-left">
+                      Поле "Полное название" является обязательным
+                  </span>
+              </div>
+          </div>
+
+          <div [dCheckAccess]="['Currency_is_active']" class="ui-grid-row m-b-xs">
+              <div class="ui-grid-col-4"><label for="is_active">Статус</label></div>
+              <div class="ui-grid-col-8">
+                <p-dropdown id="is_active" name="is_active" [options]="statuses" [(ngModel)]="currency.is_active" [autoWidth]="false" [filter]="true"></p-dropdown>
+              </div>
+          </div>
+
+      </div>
+
+      <footer>
+          <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
+              <button *ngIf="currency?.id" [dCheckAccess]="['deleteCurrency']" class="btn btn-danger" type="button" icon="fa-close" (click)="delete()">Удалить</button>
+              <button
+                [dCheckAccess]="['updateCurrency']"
+                [disabled]="!currencyForm.valid"  
+                class="btn btn-primary" type="submit" icon="fa-check" (click)="save()">Сохранить</button>
+          </div>
+      </footer>
+
+    </form>
+
+</p-dialog>

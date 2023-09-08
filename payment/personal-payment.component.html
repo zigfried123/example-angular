@@ -1,0 +1,29 @@
+<h2 class="m-b-lg">Зачисления</h2>
+
+<p-dataTable [value]="personalPayments" rows="{{localGlobals.ROWS_PER_PAGE}}" [responsive]="true" [emptyMessage]="localGlobals.NO_DATA_TEXT">
+    
+    <p-column field="id" header="№" [sortable]="false"></p-column>
+    
+    <p-column field="created_at" header="Дата платежа" [sortable]="false">
+        <ng-template let-col let-p="rowData" pTemplate="body">
+            <span>{{p[col.field] * 1000 | date:'medium'}}</span>
+        </ng-template>
+    </p-column>
+
+    <p-column field="service_name" header="Услуга" [sortable]="false"></p-column>
+
+    <p-column field="amount" header="Сумма" [sortable]="false"></p-column>
+
+    <p-column field="payment_type" header="Тип платежа" [sortable]="false"></p-column>
+
+    <p-column header="Автор" [sortable]="false">
+        <ng-template let-col let-p="rowData" pTemplate="body">
+            <span>{{p.created_by == p.user_id ? 'клиент' : 'сотрудник'}}</span>
+        </ng-template>
+    </p-column>
+
+    <p-column field="comment" header="Основание" [sortable]="false"></p-column>
+
+</p-dataTable>
+
+<p-paginator rows="{{localGlobals.ROWS_PER_PAGE}}" totalRecords="{{totalRecords}}" first="{{firstRowIndex}}" (onPageChange)="paginate($event)"></p-paginator>

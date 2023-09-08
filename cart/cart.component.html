@@ -1,0 +1,21 @@
+<ngx-ui-loader></ngx-ui-loader>
+
+<div *ngIf="!cart">
+    Загрузка...
+</div>
+<div *ngIf="cart && cart.articles.length > 0">
+    <cart-articles></cart-articles>
+    <cart-obtain-method></cart-obtain-method>
+    <cart-payment-type></cart-payment-type>
+</div>
+
+<div *ngIf="cart && cart.articles.length == 0">
+    <p>Корзина пуста.</p>
+
+    <br>
+
+    <label class="btn btn-primary">
+        <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+        Загрузить товары из Excel <input type="file" accept=".xls,.xlsx" (change)="data.importArticles($event)" hidden>
+    </label>
+</div>

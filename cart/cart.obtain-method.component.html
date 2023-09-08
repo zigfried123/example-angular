@@ -1,0 +1,199 @@
+<div *ngIf="!isGuest && data.step == CartStep.ObtainMethod">
+    <div class="panel panel-default">
+        <div class="panel-heading">Способ получения</div>
+        <div class="panel-body">
+
+            <!-- obtain method -->
+            <div class="btn-group">
+                <button type="button" class="btn btn-default"
+                        [ngClass]="{'btn-success': data.cart.obtainMethod == CartObtainMethod.OwnStorePickup}"
+                        (click)="data.setObtainMethod(CartObtainMethod.OwnStorePickup)">
+                    Самовывоз
+                </button>
+                <button type="button" class="btn btn-default"
+                        [ngClass]="{'btn-success': data.cart.obtainMethod == CartObtainMethod.Delivery}"
+                        (click)="data.setObtainMethod(CartObtainMethod.Delivery)">
+                    Доставка
+                </button>
+            </div>
+
+            <!-- delivery it's SimplifiedShipping and Delivery -->
+            <div *ngIf="data.cart.obtainMethod == CartObtainMethod.Delivery">
+                <div class="radio" *ngFor="let address of deliveryAddresses; let inx=index">
+                    <label>
+                        <input type="radio" name="obtain-method" value="{{address.Id}}"
+                               (change)="data.setDeliveryAddress(address.Id)"
+                               [checked]="address.Id == cart.deliveryAddressId">
+                        {{address.Address}}
+                    </label>
+                </div>
+
+                <br *ngIf="deliveryAddresses.length == 0"/>
+
+                <div class="form-inline">
+                    <address-suggestions (notify)='onAddressChangeNotify($event)' style="margin-right: 0.5em;"></address-suggestions>
+                    <button class="btn btn-default" type="button" (click)="addDeliveryAddress()" [disabled]="!newDeliveryAddress">Добавить новый адрес</button>
+                </div>
+
+                <br/>
+
+                <div *ngIf="!data.cart.deliveryAddressId">Для дальнейшего оформления выберите адрес доставки.</div>
+                <div *ngIf="data.cart.deliveryAddressId">
+
+                    <!-- SimplifiedShipping for Moscow only -->
+                    <div class="btn-group" *ngIf="data.deliveryAddressLocationId == AppConfig.MoscowLocationId">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default"
+                                    [ngClass]="{'btn-success': data.cart.deliveryOption == CartDeliveryOption.Own}"
+                                    (click)="data.setDeliveryOption(CartDeliveryOption.Own)">
+                                Курьер
+                            </button>
+                            <button type="button" class="btn btn-default"
+                                    [ngClass]="{'btn-success': data.cart.deliveryOption == CartDeliveryOption.Outsource}"
+                                    (click)="data.setDeliveryOption(CartDeliveryOption.Outsource)">
+                                Служба доставки
+                            </button>
+                        </div>
+
+                        <br/><br/>
+                    </div>
+
+                    <div *ngIf="data.cart.obtainMethod == CartObtainMethod.Delivery && data.cart.deliveryOption == CartDeliveryOption.Own">
+                        <mat-form-field>
+                            <input matInput [matDatepickerFilter]="deliveryDateFilter" [matDatepicker]="picker" placeholder="Дата доставки"
+                                   (dateChange)="data.setDeliveryDate($event.value)" [formControl]="deliveryDateControl">
+                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                        </mat-form-field>
+
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <label style="margin-right: 0.5em;">Время доставки</label>
+
+                                <select class="form-control"
+                                        (change)="data.setDeliveryTimeRange($event.target.value)">
+                                    <option></option>
+                                    <option *ngFor="let timeRange of data.deliveryTimeRanges" value="{{timeRange.id}}"
+                                            [selected]="data.cart.deliveryTimeRangeId == timeRange.id"
+                                    >
+                                        {{timeRange.name}} ({{timeRange.time_from}} - {{timeRange.time_to}})
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--
+                    <div *ngIf="data.cart.obtainMethod == CartObtainMethod.Delivery && data.yandexDeliveries != null && data.cart.deliveryOption == CartDeliveryOption.Outsource">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Доступные услуги и даты доставки</div>
+                            <div class="panel-body">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>&nbsp;</th>
+                                        <th>Служба</th>
+                                        <th>Тариф</th>
+                                        <th>Стоимость</th>
+                                        <th>Даты доставки</th>
+                                        <th>Временной интервал</th>
+                                    </tr>
+                                    </thead>
+                                    <tr *ngFor="let delivery of data.yandexDeliveries">
+                                        <td class="by-content">
+                                            <button type="button" class="btn btn-default" (click)="data.setYandexDelivery(delivery)"
+                                                    *ngIf="!data.cart.yandexDelivery || data.cart.yandexDelivery.DeliveryId != delivery.DeliveryId || data.cart.yandexDelivery.TariffId != delivery.TariffId">
+                                                Выбрать
+                                            </button>
+                                            <button type="button" class="btn btn-default btn-success"
+                                                    *ngIf="data.cart.yandexDelivery && data.cart.yandexDelivery.DeliveryId == delivery.DeliveryId && data.cart.yandexDelivery.TariffId == delivery.TariffId">
+                                                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                        <td class="by-content">{{delivery.CompanyName}}</td>
+                                        <td class="by-content">{{delivery.TariffName}}</td>
+                                        <td class="by-content">{{delivery.CostWithRules|number:'1.2-2'}} &#x20bd;</td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <span *ngIf="delivery.DeliveryDates.length > 1">
+                                                    {{delivery.DeliveryDates[0].format('DD.MM.YYYY')}} - {{delivery.DeliveryDates[1].format('DD.MM.YYYY')}}
+                                                </span>
+                                                <span *ngIf="delivery.DeliveryDates.length == 1">
+                                                    {{delivery.DeliveryDates[0].format('DD.MM.YYYY')}}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div *ngIf="delivery.Intervals.length == 1">
+                                                {{delivery.Intervals[0].Interval}}
+                                            </div>
+                                            <div *ngIf="delivery.Intervals.length != 1">
+                                                <select class="form-control"
+                                                        [disabled]="!data.cart.yandexDelivery || data.cart.yandexDelivery.DeliveryId != delivery.DeliveryId || data.cart.yandexDelivery.TariffId != delivery.TariffId"
+                                                        (change)="data.setYandexDeliveryInterval(delivery, $event.target.value)">
+                                                    <option *ngFor="let interval of delivery.Intervals" value="{{interval.Id}}"
+                                                            [selected]="delivery.SelectedIntervalId == interval.Id"
+                                                    >
+                                                        {{interval.Interval}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-primary" type="button" (click)="data.changeStep(CartStep.PaymentType)">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        Выбор способа оплаты
+    </button>
+</div>
+
+<div *ngIf="!isGuest && data.step == CartStep.PaymentType">
+    <div class="panel panel-default">
+        <div class="panel-heading">Способ получения</div>
+        <div class="panel-body">
+            <div *ngIf="data.cart.obtainMethod == CartObtainMethod.OwnStorePickup">
+                Самовывоз
+            </div>
+            <div *ngIf="data.cart.obtainMethod == CartObtainMethod.Delivery && data.cart.deliveryOption == CartDeliveryOption.Own">
+                Доставка курьером<br/>
+                {{data.getDeliveryAddress()?.Address}}<br/>
+                {{cart.deliveryDate.format('DD.MM.YYYY')}}
+            </div>
+            <div *ngIf="data.cart.obtainMethod == CartObtainMethod.Delivery && data.cart.deliveryOption == CartDeliveryOption.Outsource">
+                Доставка<br/>
+                {{data.getDeliveryAddress()?.Address}}
+
+                <div *ngIf="data.cart.yandexDelivery">
+                    {{data.cart.yandexDelivery.CompanyName}},
+                    <span *ngIf="data.cart.yandexDelivery.DeliveryDates.length > 1">
+                        {{data.cart.yandexDelivery.DeliveryDates[0].format('DD.MM.YYYY')}} - {{data.cart.yandexDelivery.DeliveryDates[1].format('DD.MM.YYYY')}},
+                    </span>
+                    <span *ngIf="data.cart.yandexDelivery.DeliveryDates.length == 1">
+                        {{data.cart.yandexDelivery.DeliveryDates[0].format('DD.MM.YYYY')}},
+                    </span>
+                    {{data.cart.yandexDelivery.CostWithRules|number:'1.2-2'}} &#x20bd;
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-primary" type="button" (click)="data.changeStep(CartStep.ObtainMethod)">
+        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+        Вернуться к изменению способа получения
+    </button>
+
+    <br/><br/>
+</div>
+
+<div *ngIf="isGuest && data.step == CartStep.ObtainMethod">
+    <p>Для дальнейшего оформления, наобходимо войти на сайт.</p>
+</div>
