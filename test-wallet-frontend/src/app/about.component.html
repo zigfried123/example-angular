@@ -1,0 +1,34 @@
+<div id="wrapper" *ngIf="film">
+
+    <div id="left-info">
+
+        <div><a [routerLink]="['/search-film']">На главную</a></div>
+
+        <div id="poster">
+            <img src="{{film.poster}}">
+        </div>
+    </div>
+
+    <div id="center-info">
+        <h2 id='title'>{{film.title}}</h2>
+
+        <div id="details">
+
+            <div id="year">Год: {{film.year}}</div>
+
+            <div id="country">Страна: {{film.country}}</div>
+
+            <div id="director">Режиссер: {{film.director}}</div>
+
+            <div id="writer">Сценарист: {{film.writer}}</div>
+
+        </div>
+
+    </div>
+
+    <div id="right-info">
+        <h3 id="actors">В ролях: <p *ngFor="let actor of film.actors">{{actor}}</p></h3>
+    </div>
+
+</div>
+

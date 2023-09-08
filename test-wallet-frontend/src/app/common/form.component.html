@@ -1,0 +1,42 @@
+<div style="text-align: center">
+
+    <h2>{{name}}</h2>
+
+    <div id='form-wrap'>
+
+    <form [formGroup]="parentForm">
+        <div *ngFor="let field of objectKeys">
+            <div *ngIf="field.indexOf('Values') == -1">
+                <div [ngSwitch]="fields[field]">
+                    <div *ngSwitchCase="'text'" class="form-group">
+                        <mat-form-field *ngIf="field">
+                            <mat-label>{{field}}</mat-label>
+                            <input formControlName="{{field}}" id="{{field}}" matInput type="{{fields[field]}}" required>
+                        </mat-form-field>
+                    </div>
+                    <div *ngSwitchCase="'select'" class="form-group">
+
+                        <mat-form-field>
+                            <mat-label>{{field}}</mat-label>
+                            <mat-select formControlName="{{field}}">
+                                <mat-option *ngFor="let option of fields[field+'Values']" [value]="option.id">
+                                    {{option.name}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button [disabled]="parentForm.invalid" style="float: right" mat-button type="submit" (click)="onSubmit()">Отправить</button>
+
+    </form>
+
+</div>
+
+</div>
+
+
+
+

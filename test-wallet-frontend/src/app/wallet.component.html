@@ -1,0 +1,18 @@
+
+<h2>Управление кошельком</h2>
+
+<div style="display: inline; text-align: center">
+
+<div class="text-success" *ngIf="balance">
+Ваш баланс: {{balance}}
+</div>
+
+
+
+
+</div>
+
+<div>
+    <form-template [parentForm]="walletForm"  (submitForm)="submit($event)" walletId="{{walletId}}" name="Изменить баланс" [fields]="{walletId: 'hidden',sum: 'text', currency: 'select', reason: 'select', transactionType: 'select', transactionTypeValues: [{id: 1, name: 'debit'},{id: 2, name: 'credit'}], reasonValues: [{id: 1, name: 'stock'},{id: 2, name: 'refund'}], currencyValues: [{id: 1, name: 'RUB'},{id: 2, name: 'USD'}]}"></form-template>
+
+</div>

@@ -1,0 +1,30 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body {
+    height:100%;
+}
+
+#wrapper {
+    margin:0 auto;
+    width:80%;
+}
+
+a{
+    cursor: pointer;
+}
+
+a.active{
+    color: red;
+}
+h2{
+    text-align:center;
+}
+
+#form-wrap{
+    display: inline-block;
+
+}
+
+.center{
+    margin:0 auto;
+}

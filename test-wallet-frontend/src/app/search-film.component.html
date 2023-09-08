@@ -1,0 +1,21 @@
+<div id='wrapper'>
+    <h2>Выберите фильм</h2>
+
+    <mat-form-field>
+        <input id="search" type="text" matInput [formControl]="search" [matAutocomplete]="auto" (keyup)="onChangedSearch($event)">
+    </mat-form-field>
+
+    <button class='btn btn-default' (click)="resetSearchInput()">Сброс</button>
+
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSelected($event)">
+        <mat-option *ngFor="let film of filmSearchList" [value]="film">
+            {{film.Title}}
+        </mat-option>
+    </mat-autocomplete>
+
+    <div style="text-align:right" *ngFor="let film of filmSaved; let i = index">
+        <a target='_blank'  [routerLink]="['/about', film.imdbID]">{{i+'. '+film.Title}}</a>
+        <a (click)="removeFilm(film.Title)"><mat-icon>close</mat-icon></a>
+    </div>
+
+</div>

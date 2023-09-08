@@ -1,0 +1,18 @@
+
+#wrapper {
+    height:100%;
+    border: 1px solid red;
+    color: white;
+    background: darkblue;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+}
+
+#details{
+    margin-top: 50px;
+}
+
+#center-info,#right-info{
+    margin-left:50px;
+}
